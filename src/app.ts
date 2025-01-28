@@ -9,6 +9,8 @@ import { MORGAN_FORMAT } from "./libs/config";
 import session from "express-session";
 import ConnectMongoDB from "connect-mongodb-session";
 import { T } from "./libs/types/common";
+import { Server as SocketIOServer } from "socket.io";
+import http from "http";
 
 const MongoDBStore = ConnectMongoDB(session);
 const store = new MongoDBStore({
@@ -54,4 +56,27 @@ app.set("view engine", "ejs");
 app.use("/admin", routerAdmin);
 app.use("/", router); //Middleware design pattern
 
-export default app;
+const server = http.createServer(app);
+const io = new SocketIOServer(server, {
+  cors: {
+    origin: true,
+    credentials: true,
+  },
+});
+
+let summaryClient = 0 
+io.on("connection", (socket) => {
+  summaryClient++;
+  console.log(`Connection & total [${summaryClient}]`)
+
+  socket.on("disconnect", () => {
+    summaryClient--;
+    console.log(`Disconnect & total [${summaryClient}]`)
+  })
+})
+
+
+
+
+
+export default server;
