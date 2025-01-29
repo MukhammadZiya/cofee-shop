@@ -1,16 +1,15 @@
 import dotenv from "dotenv";
-dotenv.config();
+dotenv.config({
+  path: process.env.NODE_ENV === "production" ? ".env.production" : ".env",
+});
 import mongoose from "mongoose";
 import server from "./app";
-
-console.log("PORT:", process.env.PORT);
-console.log("MONGO_URL:", process.env.MONGO_URL);
 
 mongoose
   .connect(process.env.MONGO_URL as string, {})
   .then((data) => {
     console.log("Connected to MongoDB successfully ");
-    const PORT = process.env.PORT ?? 3003;
+    const PORT = process.env.PORT ?? 4003;
     server.listen(PORT, function () {
       console.info(`The server is running successfully on port: ${PORT}`);
       console.info(`Admin project  http://localhost:${PORT}/admin \n`);
